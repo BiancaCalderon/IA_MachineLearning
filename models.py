@@ -38,6 +38,8 @@ class PerceptronModel(Module):
         super(PerceptronModel, self).__init__()
         
         "*** YOUR CODE HERE ***"
+
+        self.w = Parameter(torch.ones(1, dimensions))
         
 
     def get_weights(self):
@@ -57,6 +59,7 @@ class PerceptronModel(Module):
         The pytorch function `tensordot` may be helpful here.
         """
         "*** YOUR CODE HERE ***"
+        return torch.tensordot(x, self.w, dims=([1], [1]))
         
 
     def get_prediction(self, x):
@@ -66,7 +69,8 @@ class PerceptronModel(Module):
         Returns: 1 or -1
         """
         "*** YOUR CODE HERE ***"
-
+        score = self.run(x).item()
+        return 1 if score >= 0 else -1
 
 
     def train(self, dataset):
@@ -82,6 +86,23 @@ class PerceptronModel(Module):
             dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
             "*** YOUR CODE HERE ***"
 
+            while True:
+                    errores = 0
+                    for batch in dataloader:
+                        x = batch['x'] 
+                        label = batch['label']
+                        
+                        pred = self.get_prediction(x)
+                        
+                        
+                        if pred != label.item():
+                           
+                            self.w[0] += label.item() * x[0]
+                            errores += 1
+                    
+                    
+                    if errores == 0:
+                        break
 
 
 class RegressionModel(Module):
