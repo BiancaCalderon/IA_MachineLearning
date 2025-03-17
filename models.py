@@ -152,26 +152,74 @@ class RegressionModel(nn.Module):
 
 
 
-class DigitClassificationModel(Module):
+class DigitClassificationModel(torch.nn.Module):
     """
-    A model for handwritten digit classification using the MNIST dataset.
-
-    Each handwritten digit is a 28x28 pixel grayscale image, which is flattened
-    into a 784-dimensional vector for the purposes of this model. Each entry in
-    the vector is a floating point number between 0 and 1.
-
-    The goal is to sort each digit into one of 10 classes (number 0 through 9).
-
-    (See RegressionModel for more information about the APIs of different
-    methods here. We recommend that you implement the RegressionModel before
-    working on this part of the project.)
+    Modelo de red neuronal para clasificación de dígitos en MNIST.
     """
+
     def __init__(self):
-        # Initialize your model parameters here
         super().__init__()
-        input_size = 28 * 28
-        output_size = 10
-        "*** YOUR CODE HERE ***"
+        input_size = 28 * 28  # 784
+        output_size = 10  # 10 clases (0-9)
+
+        # Definimos las capas sin Sequential para cumplir con las reglas del proyecto
+        self.fc1 = Linear(input_size, 256)
+        self.fc2 = Linear(256, 128)
+        self.fc3 = Linear(128, 64)
+        self.fc4 = Linear(64, output_size)  # Sin activación en la última capa
+
+    def run(self, x):
+        """
+        Ejecuta la red neuronal en un batch de imágenes.
+
+        Entrada:
+            x: Tensor de tamaño (batch_size, 784)
+        Salida:
+            Tensor de tamaño (batch_size, 10) con los logits de cada clase.
+        """
+        x = relu(self.fc1(x))
+        x = relu(self.fc2(x))
+        x = relu(self.fc3(x))
+        return self.fc4(x)  # Sin activación en la última capa
+
+    def get_loss(self, x, y):
+        """
+        Calcula la pérdida de clasificación.
+
+        Entrada:
+            x: Tensor de entrada con shape (batch_size, 784)
+            y: Tensor con labels en formato one-hot (batch_size, 10)
+        Salida:
+            Pérdida computada con CrossEntropyLoss.
+        """
+        return cross_entropy(self.run(x), y)
+
+    def train(self, dataset, epochs=5, batch_size=64, learning_rate=0.001):
+        """
+        Entrena el modelo usando el dataset proporcionado.
+
+        Entrada:
+            dataset: Un objeto DigitClassificationDataset proporcionado por el backend.
+            epochs: Número de épocas de entrenamiento.
+            batch_size: Tamaño del batch para el entrenamiento.
+            learning_rate: Tasa de aprendizaje.
+        """
+        dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+        optimizer = optim.Adam(self.parameters(), lr=learning_rate)
+
+        for epoch in range(epochs):
+            total_loss = 0
+            for batch in dataloader:
+                x, y = batch["x"], batch["label"]
+                optimizer.zero_grad()
+                loss = self.get_loss(x, y)
+                loss.backward()
+                optimizer.step()
+                total_loss += loss.item()
+
+            print(f"Epoch {epoch+1}/{epochs}, Loss: {total_loss:.4f}")
+
+
 
 
 
