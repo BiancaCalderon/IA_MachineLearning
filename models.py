@@ -222,52 +222,6 @@ class DigitClassificationModel(torch.nn.Module):
 
 
 
-
-
-    def run(self, x):
-        """
-        Runs the model for a batch of examples.
-
-        Your model should predict a node with shape (batch_size x 10),
-        containing scores. Higher scores correspond to greater probability of
-        the image belonging to a particular class.
-
-        Inputs:
-            x: a tensor with shape (batch_size x 784)
-        Output:
-            A node with shape (batch_size x 10) containing predicted scores
-                (also called logits)
-        """
-        """ YOUR CODE HERE """
-
- 
-
-    def get_loss(self, x, y):
-        """
-        Computes the loss for a batch of examples.
-
-        The correct labels `y` are represented as a tensor with shape
-        (batch_size x 10). Each row is a one-hot vector encoding the correct
-        digit class (0-9).
-
-        Inputs:
-            x: a node with shape (batch_size x 784)
-            y: a node with shape (batch_size x 10)
-        Returns: a loss tensor
-        """
-        """ YOUR CODE HERE """
-
-    
-        
-
-    def train(self, dataset):
-        """
-        Trains the model.
-        """
-        """ YOUR CODE HERE """
-
-
-
 class LanguageIDModel(Module):
     """
     A model for language identification at a single-word granularity.
