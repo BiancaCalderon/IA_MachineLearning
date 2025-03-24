@@ -130,17 +130,16 @@ class RegressionModel(nn.Module):
             y: a node with shape (batch_size x 1), containing the true y-values
         Returns: a tensor of size 1 containing the loss
         """
-        # Usar directamente mse_loss en lugar de nn.MSELoss()
-        return mse_loss(self(x), y)
+        # Calcular la predicción
+        predictions = self.forward(x)  # Pasar x a través de la red
+        return mse_loss(predictions, y)  # Calcular y devolver la pérdida
 
     def train(self, dataset):
-        """
-        Trains the model.
-        """
         optimizer = optim.Adam(self.parameters(), lr=0.001)
         dataloader = DataLoader(dataset, batch_size=50, shuffle=True)
         
         for epoch in range(1000):
+            total_loss = 0
             for batch in dataloader:
                 x = batch['x']
                 y = batch['label']
@@ -149,7 +148,12 @@ class RegressionModel(nn.Module):
                 loss = self.get_loss(x, y)
                 loss.backward()
                 optimizer.step()
+                
+                total_loss += loss.item()
 
+            # Imprimir el progreso cada 100 épocas
+            if epoch % 100 == 0:
+                print(f"Epoch {epoch + 1}/1000, Loss: {total_loss / len(dataloader)}")
 
 
 class DigitClassificationModel(torch.nn.Module):
